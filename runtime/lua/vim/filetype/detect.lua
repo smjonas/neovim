@@ -18,6 +18,17 @@ local function iter_lines(bufnr, start_lnum, end_lnum)
   return ipairs(vim.api.nvim_buf_get_lines(bufnr, start_lnum - 1, end_lnum, false))
 end
 
+---@private
+local function get_next_non_blank_line(bufnr, start_lnum)
+  local i = start_lnum
+  while i < count_lines(bufnr) do
+    local line = get_lines(bufnr, i)
+    if line:find("%S") then
+      return line
+    end
+  end
+end
+
 function M.asm(_, bufnr)
 
 end
@@ -61,7 +72,12 @@ function M.csh(_, bufnr)
 end
 
 function M.dat(_, bufnr)
-
+  if vim.filetype_dat then
+    vim.bo[bufnr].filetype = vim.filetype_dat
+  elseif 
+    local line = get_next_non_blank_line(bufnr, 1)
+    if line and line:find("^%s*%%$%w+")
+  end
 end
 
 function M.dep3patch(_, bufnr)
@@ -161,6 +177,7 @@ function M.header(_, bufnr)
       return
     end
   end
+
   if vim.g.c_syntax_for_h then
       vim.bo[bufnr].filetype = "c"
   elseif vim.g.ch_syntax_for_h then
@@ -398,7 +415,11 @@ function M.sql(_, bufnr)
 end
 
 function M.src(_, bufnr)
-
+  if vim.g.filetype_src then
+    vim.bo[bufnr].filetype = vim.g.filetype_src
+  else
+    -- TODO: continue
+  end
 end
 
 function M.sys(_, bufnr)
